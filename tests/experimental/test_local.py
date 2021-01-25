@@ -8,7 +8,8 @@ from plumbum import (local, LocalPath, FG, BG, TF, RETCODE, ERROUT, TEE,
                     CommandNotFound, ProcessExecutionError, ProcessTimedOut, ProcessLineTimedOut)
 from plumbum.lib import six, IS_WIN32
 from plumbum.fs.atomic import AtomicFile, AtomicCounterFile, PidFile
-from plumbum.machines.local import LocalCommand, PlumbumLocalPopen
+from plumbum.machines.local import LocalCommand
+from plumbum.experimental.aio.machines.local import PlumbumLocalPopen
 from plumbum.path import RelativePath
 import plumbum
 
@@ -24,16 +25,14 @@ SDIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestLocalPopen:
-    @pytest.mark.skipif(sys.version_info < (3, 2),
-                        reason="Context Manager was introduced in Python 3.2")
-    def test_contextmanager(self):
+    @pytest.mark.asyncio
+    async def test_contextmanager(self):
         if IS_WIN32:
             command = ['dir']
         else:
             command = ['ls']
-        with PlumbumLocalPopen(command):
+        async with PlumbumLocalPopen(command):
             pass
-        raise Exception("Fail")
 
 
 class TestLocalPath:
